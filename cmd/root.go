@@ -22,9 +22,9 @@ const (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "halp",
-	Short: "A verryyy normal and usual application built to help you send SoS messages (is a joke)",
+	Short: "A verryyy normal and usual application built to help you send SoS messages",
 	Long: `
-A verryyy normal and usual application built to help you send SoS messages (is a joke).
+A verryyy normal and usual application built to help you send SoS messages.
 
 The tool will by default switch off the LED before displaying the morse code message and will restore
 it back to this initial state when the message finishes displaying
