@@ -54,7 +54,7 @@ Use "halp [command] --help" for more information about a command.
 
 ## Commands:
 ```
-halp -m sos [--path] # display sos in morse code on your capslock LED
+halp -m <message> [--path] # display message in morse code on your capslock LED
 ```
 
 In case the program is stopped mid-way while displaying the morse code or it crashes due to whatever reason, the state of the capslock LED can be reset to `off` by running the following:
