@@ -34,8 +34,32 @@ func morseDisplay(path, word string) error {
 	return nil
 }
 
+func getInitialState(path string) (bool, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+	state := make([]byte, 1)
+	count, err := file.Read(state)
+	if err != nil {
+		return false, err
+	}
+	if string(state[:count]) == "0" {
+		return false, nil
+	}
+	return true, nil
+}
+
 func parse(path, seq string) error {
+	initState, err := getInitialState(path)
+	if err != nil {
+		return err
+	}
 	words := strings.Split(seq, "/")
+	err = UpdateState(path, OFF) // switch off LED initially
+	if err != nil {
+		return err
+	}
 	for _, word := range words {
 		err := morseDisplay(path, word)
 		if err != nil {
@@ -50,6 +74,10 @@ func parse(path, seq string) error {
 		if err != nil {
 			return err
 		}
+	}
+	err = UpdateState(path, initState) // restore state of LED to initial state
+	if err != nil {
+		return err
 	}
 	return nil
 }

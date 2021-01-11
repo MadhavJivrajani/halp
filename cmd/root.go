@@ -24,6 +24,11 @@ var rootCmd = &cobra.Command{
 	Use:   "halp",
 	Short: "A verryyy normal and usual application built to help you send SoS messages (is a joke)",
 	Long: `
+A verryyy normal and usual application built to help you send SoS messages (is a joke).
+
+The tool will by default switch off the LED before displaying the morse code message and will restore
+it back to this initial state when the message finishes displaying
+
 Syntax:
 halp -m <message>
 `,
