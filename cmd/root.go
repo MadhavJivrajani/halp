@@ -14,16 +14,27 @@ import (
 
 var cfgFile string
 
+const (
+	defaultLEDPath = "/sys/class/leds/input3::capslock/brightness"
+	defaultMsg = ""
+)
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "halp",
 	Short: "A verryyy normal and usual application built to help you send SoS messages (is a joke)",
+	Long: `
+Syntax:
+halp -m <message>
+`,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) == 0 {
+		msg, _ := cmd.Flags().GetString("message")
+		if len(msg) == 0 {
 			return fmt.Errorf("PROVIDE MESSAGE TO SEND! YOUR LIFE MIGHT DEPEND ON IT!")
 		}
-		return morse.SendSignal(args[0])
+		path, _ := cmd.Flags().GetString("path")
+		return morse.SendSignal(path, msg)
 	},
 }
 
@@ -36,9 +47,21 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.halp.yaml)")
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	rootCmd.Flags().StringP(
+		"message",
+		"m",
+		defaultMsg,
+		"message to diplay in morse code",
+	)
+
+	rootCmd.Flags().StringP(
+		"path",
+		"p",
+		defaultLEDPath,
+		"/path/to/capslockLED",
+	)
 }
 
 // initConfig reads in config file and ENV variables if set.

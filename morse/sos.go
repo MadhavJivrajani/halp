@@ -1,6 +1,8 @@
 package morse
 
 import (
+	"fmt"
+	"os"
 	"strings"
 	"time"
 )
@@ -11,9 +13,9 @@ const (
 	units = 200
 )
 
-func morseDisplay(word string) error {
+func morseDisplay(path, word string) error {
 	for _, c := range word {
-		err := UpdateState(ON)
+		err := UpdateState(path, ON)
 		if err != nil {
 			return err
 		}
@@ -22,7 +24,7 @@ func morseDisplay(word string) error {
 		} else if c == '-' {
 			time.Sleep(time.Millisecond * 3 * units)
 		}
-		err = UpdateState(OFF)
+		err = UpdateState(path, OFF)
 		if err != nil {
 			return err
 		}
@@ -32,19 +34,19 @@ func morseDisplay(word string) error {
 	return nil
 }
 
-func parse(seq string) error {
+func parse(path, seq string) error {
 	words := strings.Split(seq, "/")
 	for _, word := range words {
-		err := morseDisplay(word)
+		err := morseDisplay(path, word)
 		if err != nil {
 			return err
 		}
-		err = UpdateState(ON)
+		err = UpdateState(path, ON)
 		if err != nil {
 			return err
 		}
 		time.Sleep(time.Millisecond * 7 * units)
-		err = UpdateState(OFF)
+		err = UpdateState(path, OFF)
 		if err != nil {
 			return err
 		}
@@ -54,11 +56,14 @@ func parse(seq string) error {
 
 // SendSignal 'sends' the morse signal to be
 // displayed on the capslock led
-func SendSignal(msg string) error {
+func SendSignal(path, msg string) error {
+	if _, err := os.Stat(path); err != nil {
+		return fmt.Errorf("invalid led path!")
+	}
 	morse, err := GenerateMorse(msg)
 	if err != nil {
 		return err
 	}
-	err = parse(string(morse))
+	err = parse(path, string(morse))
 	return err
 }
