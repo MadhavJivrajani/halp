@@ -16,7 +16,7 @@ var cfgFile string
 
 const (
 	defaultLEDPath = "/sys/class/leds/input3::capslock/brightness"
-	defaultMsg = ""
+	defaultMsg     = ""
 )
 
 // rootCmd represents the base command when called without any subcommands
