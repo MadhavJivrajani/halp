@@ -21,7 +21,6 @@ Or you can clone this repository and work directly with the `halp` executable!
 git clone https://github.com/MadhavJivrajani/halp.git
 cd halp
 go build -o halp main.go
-chmod +x halp
 mv halp /usr/bin # to make the executable available system wide
 ```
 
