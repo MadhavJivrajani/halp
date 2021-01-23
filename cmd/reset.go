@@ -5,9 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	OFF = false
-)
 
 // resetCmd represents the reset command
 var resetCmd = &cobra.Command{
@@ -21,7 +18,7 @@ halp reset`,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path, _ := cmd.Flags().GetString("path")
-		return morse.UpdateState(path, OFF)
+		return morse.UpdateState(path, 0)
 	},
 }
 

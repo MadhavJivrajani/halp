@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"errors"
 
 	"github.com/spf13/cobra"
 
@@ -10,13 +12,15 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/MadhavJivrajani/halp/morse"
+	"regexp"
 )
 
 var cfgFile string
 
 const (
-	defaultLEDPath = "/sys/class/leds/input3::capslock/brightness"
+	defaultLEDPath = "/sys/class/leds/input3::capslock"
 	defaultMsg     = ""
+	keyboardBacklightRegex = ".+::kbd_backlight"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -39,8 +43,54 @@ halp -m <message>
 			return fmt.Errorf("PROVIDE MESSAGE TO SEND! YOUR LIFE MIGHT DEPEND ON IT!")
 		}
 		path, _ := cmd.Flags().GetString("path")
+		screen, _ := cmd.Flags().GetBool("screen")
+		keyboard, _ := cmd.Flags().GetBool("keyboard")
+				
+		if keyboard == true && screen == true {			
+			return fmt.Errorf("Use only one of keyboard or screen options")
+		}
+
+		if keyboard == true {
+			var err error
+			path, err = getKeyboardBacklightPath()
+			if err != nil {
+				return fmt.Errorf(err.Error())
+			}			
+		} else if screen == true {
+			var err error
+			path, err = getScreenBacklightPath()
+			if err != nil {
+				return fmt.Errorf(err.Error())
+			}
+		}
+
 		return morse.SendSignal(path, msg)
 	},
+}
+
+func getKeyboardBacklightPath() (string, error) {
+	rootPath := "/sys/class/leds/"
+	re := regexp.MustCompile(keyboardBacklightRegex)
+
+	requiredDir := ""
+	
+	walk := func(fn string, fi os.FileInfo, err error) error {		
+		if re.MatchString(fn) {
+			requiredDir = fn
+		}
+		return nil
+	}
+	filepath.Walk(rootPath, walk)
+
+	if requiredDir == "" {
+		return "", errors.New("couldn't find the keyboard file")
+	}
+		
+	return requiredDir, nil
+}
+
+func getScreenBacklightPath() (string, error) {
+	return "/sys/class/backlight/intel_backlight", nil
 }
 
 func Execute() {
@@ -66,6 +116,20 @@ func init() {
 		"p",
 		defaultLEDPath,
 		"/path/to/capslockLED",
+	)
+
+	rootCmd.Flags().BoolP(
+		"screen",
+		"s",
+		false,
+		"use screen backlight",
+	)
+
+	rootCmd.Flags().BoolP(
+		"keyboard",
+		"k",
+		false,
+		"use keyboard backlight",
 	)
 }
 

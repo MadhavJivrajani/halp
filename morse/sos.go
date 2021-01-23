@@ -5,17 +5,16 @@ import (
 	"os"
 	"strings"
 	"time"
+	"strconv"
 )
 
 const (
-	ON    = true
-	OFF   = false
 	units = 200
 )
 
-func morseDisplay(path, word string) error {
+func morseDisplay(path, word string, brightness int) error {
 	for _, c := range word {
-		err := UpdateState(path, ON)
+		err := UpdateState(path, brightness)
 		if err != nil {
 			return err
 		}
@@ -24,7 +23,7 @@ func morseDisplay(path, word string) error {
 		} else if c == '-' {
 			time.Sleep(time.Millisecond * 3 * units)
 		}
-		err = UpdateState(path, OFF)
+		err = UpdateState(path, 0)
 		if err != nil {
 			return err
 		}
@@ -34,20 +33,29 @@ func morseDisplay(path, word string) error {
 	return nil
 }
 
-func getInitialState(path string) (bool, error) {
+func readFile(path string) (int, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
-	state := make([]byte, 1)
+	state := make([]byte, 10)
 	count, err := file.Read(state)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
-	if string(state[:count]) == "0" {
-		return false, nil
-	}
-	return true, nil
+	content, err := strconv.Atoi(string(state[:count - 1]))
+			
+	return content, nil
+}
+
+func getInitialState(path string) (int, error) {
+	brightness, err := readFile(path + "/brightness")
+	return brightness, err
+}
+
+func getMaxBrightness(path string) (int, error) {
+	max, err := readFile(path + "/max_brightness")
+	return max, err	
 }
 
 func parse(path, seq string) error {
@@ -55,22 +63,26 @@ func parse(path, seq string) error {
 	if err != nil {
 		return err
 	}
+	maxBrightness, err := getMaxBrightness(path)
+	if err != nil {
+		return err
+	}
 	words := strings.Split(seq, "/")
-	err = UpdateState(path, OFF) // switch off LED initially
+	err = UpdateState(path, 0) // switch off LED initially
 	if err != nil {
 		return err
 	}
 	for _, word := range words {
-		err := morseDisplay(path, word)
+		err := morseDisplay(path, word, maxBrightness)
 		if err != nil {
 			return err
 		}
-		err = UpdateState(path, ON)
+		err = UpdateState(path, maxBrightness)
 		if err != nil {
 			return err
 		}
 		time.Sleep(time.Millisecond * 7 * units)
-		err = UpdateState(path, OFF)
+		err = UpdateState(path, 0)
 		if err != nil {
 			return err
 		}
