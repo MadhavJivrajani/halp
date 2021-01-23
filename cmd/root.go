@@ -1,25 +1,26 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-	"errors"
 
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 
-	"github.com/MadhavJivrajani/halp/morse"
 	"regexp"
+
+	"github.com/MadhavJivrajani/halp/morse"
 )
 
 var cfgFile string
 
 const (
-	defaultLEDPath = "/sys/class/leds/input3::capslock"
-	defaultMsg     = ""
+	defaultLEDPath         = "/sys/class/leds/input3::capslock"
+	defaultMsg             = ""
 	keyboardBacklightRegex = ".+::kbd_backlight"
 )
 
@@ -45,8 +46,8 @@ halp -m <message>
 		path, _ := cmd.Flags().GetString("path")
 		screen, _ := cmd.Flags().GetBool("screen")
 		keyboard, _ := cmd.Flags().GetBool("keyboard")
-				
-		if keyboard == true && screen == true {			
+
+		if keyboard == true && screen == true {
 			return fmt.Errorf("Use only one of keyboard or screen options")
 		}
 
@@ -55,7 +56,7 @@ halp -m <message>
 			path, err = getKeyboardBacklightPath()
 			if err != nil {
 				return fmt.Errorf(err.Error())
-			}			
+			}
 		} else if screen == true {
 			var err error
 			path, err = getScreenBacklightPath()
@@ -73,8 +74,8 @@ func getKeyboardBacklightPath() (string, error) {
 	re := regexp.MustCompile(keyboardBacklightRegex)
 
 	requiredDir := ""
-	
-	walk := func(fn string, fi os.FileInfo, err error) error {		
+
+	walk := func(fn string, fi os.FileInfo, err error) error {
 		if re.MatchString(fn) {
 			requiredDir = fn
 		}
@@ -85,7 +86,7 @@ func getKeyboardBacklightPath() (string, error) {
 	if requiredDir == "" {
 		return "", errors.New("couldn't find the keyboard file")
 	}
-		
+
 	return requiredDir, nil
 }
 
