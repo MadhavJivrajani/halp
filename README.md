@@ -10,7 +10,15 @@
 `halp` will only work if you're running Linux. The original purpose of developing this was to learn more about the concept of 'everyhting in linux is a file' and learn more about how permissions in linux work. The idea originated after watching [this](https://www.youtube.com/watch?v=Z56Jmr9Z34Q&feature=emb_title) video.
 
 ## Installation
-Installation can be done using the `go get` command which will take care of installation of any libraries and dependencies nescessary. This will also install the `halp` executable which can be used anywhere in the termnial provided `$GOPATH/bin` is in your `PATH`.
+
+Use the executable:
+```
+curl -sSL https://github.com/MadhavJivrajani/halp/releases/download/<tag>/halp --output halp
+chmod +x halp
+mv halp /usr/bin # to make the executable available system wide
+```
+
+Installation can also done using the `go get` command which will take care of installation of any libraries and dependencies nescessary. This will also install the `halp` executable which can be used anywhere in the termnial provided `$GOPATH/bin` is in your `PATH`.
 
 ```
 go get -u github.com/MadhavJivrajani/halp
