@@ -28,8 +28,8 @@ mv halp /usr/bin # to make the executable available system wide
 ```
 A verryyy normal and usual application built to help you send SoS messages.
 
-The tool will by default switch off the LED before displaying the morse code message and will restore
-it back to this initial state when the message finishes displaying
+The tool will by default switch off the LED before displaying the morse code
+message and will restore it back to this initial state when the message finishes displaying
 
 Syntax:
 halp -m <message>
