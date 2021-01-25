@@ -21,7 +21,7 @@ var cfgFile string
 const (
 	defaultLEDPathRegex    = "/sys/class/leds/input[0-9]+::capslock"
 	defaultMsg             = ""
-	keyboardBacklightRegex = ".+::kbd_backlight"
+	keyboardBacklightRegex = ".*kbd_backlight"
 )
 
 // rootCmd represents the base command when called without any subcommands
