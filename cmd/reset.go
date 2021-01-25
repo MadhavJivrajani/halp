@@ -63,7 +63,7 @@ func init() {
 	resetCmd.Flags().StringP(
 		"path",
 		"p",
-		defaultLEDPath,
+		defaultLEDPathRegex,
 		"/path/to/resource",
 	)
 

@@ -19,7 +19,7 @@ import (
 var cfgFile string
 
 const (
-	defaultLEDPath         = "/sys/class/leds/input3::capslock"
+	defaultLEDPathRegex    = "/sys/class/leds/input[0-9]+::capslock"
 	defaultMsg             = ""
 	keyboardBacklightRegex = ".+::kbd_backlight"
 )
@@ -63,10 +63,37 @@ halp -m <message>
 			if err != nil {
 				return fmt.Errorf(err.Error())
 			}
+		} else {
+			var err error
+			path, err = getCapsLockLEDPath(path)
+			if err != nil {
+				return fmt.Errorf(err.Error())
+			}
 		}
 
 		return morse.SendSignal(path, msg)
 	},
+}
+
+func getCapsLockLEDPath(path string) (string, error) {
+	rootPath := "/sys/class/leds/"
+	re := regexp.MustCompile(path)
+
+	requiredDir := ""
+
+	walk := func(fn string, fi os.FileInfo, err error) error {
+		if re.MatchString(fn) {
+			requiredDir = fn
+		}
+		return nil
+	}
+	filepath.Walk(rootPath, walk)
+
+	if requiredDir == "" {
+		return "", errors.New("couldn't find the capslock file")
+	}
+
+	return requiredDir, nil
 }
 
 func getKeyboardBacklightPath() (string, error) {
@@ -115,8 +142,8 @@ func init() {
 	rootCmd.Flags().StringP(
 		"path",
 		"p",
-		defaultLEDPath,
-		"/path/to/capslockLED",
+		defaultLEDPathRegex,
+		"/path/to/capslockLED (accepts regex)",
 	)
 
 	rootCmd.Flags().BoolP(
